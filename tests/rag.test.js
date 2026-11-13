@@ -46,3 +46,14 @@ test('需求推薦可指出符合用途的產品與真實知識庫依據',()=>{
   assert.deepEqual(recommend('火星上的香蕉'),[]);
   assert.deepEqual(recommend(''),[]);
 });
+test('指定具體型號時不應推薦其他型號',()=>{
+  for(const query of ['MacBook PRO','macbookpro','想要 MacBook Pro 做影片剪輯']) {
+    const results=recommend(query);
+    assert.ok(results.length>0,query);
+    assert.ok(results.every(p=>p.name==='MacBook Pro'),query);
+    assert.ok(results[0].evidence.some(d=>d.text.includes('MacBook Pro')));
+  }
+  assert.ok(recommend('MacBook Air').every(p=>p.name==='MacBook Air'));
+  assert.deepEqual(recommend('iPhone 17'),[]);
+  assert.deepEqual(recommend('iPad mini'),[]);
+});

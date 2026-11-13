@@ -1,2 +1,5 @@
-# ntou-apple-rag-demo
-Apple 產品 RAG 搜尋問答資料結構教學示範
+# Apple 產品 RAG 搜尋問答示範
+
+以 Apple 台灣官網資料為主題，逐步展示關鍵字向量、餘弦相似度、min-heap Top-k、提示詞及附來源的回答。此靜態教學示範使用人工設計的關鍵字向量和抽取式回答，沒有連接大型語言模型；資料為 2026-11-13 查閱的靜態快照。
+
+直接開啟 `index.html` 或以任意靜態伺服器執行。執行測試：`node --test tests/*.test.js`。GitHub Pages 可使用 main 分支根目錄發布。工作流程見 [文件](docs/工作流程.md)。

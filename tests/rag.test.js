@@ -41,6 +41,12 @@ test('各產品與功能問題可找到相關資訊', () => {
   }
 });
 
+test('檢索會區分產品內的具體功能，避免只因產品名稱得高分',()=>{
+  assert.ok(search('AirPods 降噪').results.every(d=>d.text.includes('降噪')));
+  assert.ok(search('iPhone 相機').results.every(d=>/相機|鏡頭|攝影/.test(d.text)));
+  assert.ok(search('Apple Watch 睡眠').results.every(d=>d.text.includes('睡眠')));
+});
+
 test('需求推薦可指出符合用途的產品與真實知識庫依據',()=>{
   const laptop=recommend('我需要輕巧筆電帶去上課');
   assert.ok(laptop.some(p=>p.name==='MacBook Air'));

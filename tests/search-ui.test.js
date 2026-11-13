@@ -25,3 +25,9 @@ test('範例問題立即顯示答案，空白問題提示且保留結果',()=>{
   get('#query').value='   '; get('#form').listeners.submit({preventDefault(){}});
   assert.match(get('#error').textContent,/輸入問題/); assert.match(get('#answer').innerHTML,/降噪/);
 });
+test('回答下方呈現本次檢索資料與分數，無結果時顯示提示',()=>{
+  const {get}=setup(); get('#query').value='iPad 晶片'; get('#form').listeners.submit({preventDefault(){}});
+  assert.match(get('#retrieved').innerHTML,/D1/); assert.match(get('#retrieved').innerHTML,/1\.00/); assert.match(get('#retrieved').innerHTML,/apple\.com\/tw/);
+  get('#query').value='火星上的香蕉'; get('#form').listeners.submit({preventDefault(){}});
+  assert.match(get('#retrieved').innerHTML,/沒有符合/); assert.doesNotMatch(get('#retrieved').innerHTML,/D1/);
+});

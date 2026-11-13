@@ -18,7 +18,7 @@ function setup() {
 test('送出問題後立即顯示答案與完整比對統計，並移除控制列',()=>{
   const {get}=setup(); get('#query').value='MacBook Air 尺寸'; get('#form').listeners.submit({preventDefault(){}});
   assert.match(get('#answer').innerHTML,/13 吋/);
-  assert.equal(get('#compared').textContent,50);
+  assert.equal(get('#compared').textContent,200);
   assert.doesNotMatch(html,/class="controls"/);
 });
 test('範例問題立即顯示答案，空白問題提示且保留結果',()=>{
@@ -40,4 +40,10 @@ test('調整前 k 名立即重新搜尋，結果及統計同步更新',()=>{
   assert.equal(get('#k-value').textContent,5);
   get('#top-k').value='1'; get('#top-k').listeners.change();
   assert.equal((get('#retrieved').innerHTML.match(/retrieved-item/g)||[]).length,1);
+});
+test('送出使用需求後顯示推薦與來源，未知需求提供提示',()=>{
+  const {get}=setup(); get('#needs').value='我需要降噪耳機'; get('#recommend-form').listeners.submit({preventDefault(){}});
+  assert.match(get('#recommendations').innerHTML,/AirPods Pro 3/); assert.match(get('#recommendations').innerHTML,/apple\.com\/tw/);
+  get('#needs').value='火星香蕉'; get('#recommend-form').listeners.submit({preventDefault(){}});
+  assert.match(get('#recommendations').innerHTML,/無法辨識/);
 });

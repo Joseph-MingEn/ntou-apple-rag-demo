@@ -10,6 +10,7 @@ function setup() {
   const elements = {};
   const get = s => elements[s] ||= {value:'', textContent:'', innerHTML:'', listeners:{}, addEventListener(type, callback){this.listeners[type]=callback}};
   get('#query').value = 'iPad 使用什麼晶片？';
+  get('#top-k').value = '2';
   const example = {dataset:{query:'AirPods 有降噪嗎？'},addEventListener(type, callback){this.callback=callback}};
   vm.runInNewContext(app,{RAG:rag,document:{querySelector:get,querySelectorAll:()=>[example]}});
   return {get,example};
@@ -30,4 +31,13 @@ test('回答下方呈現本次檢索資料與分數，無結果時顯示提示',
   assert.match(get('#retrieved').innerHTML,/D1/); assert.match(get('#retrieved').innerHTML,/1\.00/); assert.match(get('#retrieved').innerHTML,/apple\.com\/tw/);
   get('#query').value='火星上的香蕉'; get('#form').listeners.submit({preventDefault(){}});
   assert.match(get('#retrieved').innerHTML,/沒有符合/); assert.doesNotMatch(get('#retrieved').innerHTML,/D1/);
+});
+
+test('調整前 k 名立即重新搜尋，結果及統計同步更新',()=>{
+  const {get}=setup(); get('#query').value='iPad'; get('#form').listeners.submit({preventDefault(){}});
+  get('#top-k').value='5'; get('#top-k').listeners.change();
+  assert.equal((get('#retrieved').innerHTML.match(/retrieved-item/g)||[]).length,5);
+  assert.equal(get('#k-value').textContent,5);
+  get('#top-k').value='1'; get('#top-k').listeners.change();
+  assert.equal((get('#retrieved').innerHTML.match(/retrieved-item/g)||[]).length,1);
 });

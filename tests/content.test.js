@@ -10,3 +10,10 @@ test('回答優先於檢索過程，知識庫預設收合且可展開', () => {
   assert.ok(html.indexOf('class="answer-card"') < html.indexOf('class="main-panel"'));
   assert.match(html, /<details class="knowledge"\s*>\s*<summary[\s\S]*?DOCUMENTS[\s\S]*?<\/summary>\s*<div id="documents" class="documents"><\/div>\s*<\/details>/);
 });
+
+test('知識區塊預設收合，統計及紀錄位於右欄且沒有完成回答提示框', () => {
+  for (const id of ['vector-details','heap-details','prompt-details']) assert.match(html,new RegExp(`<details id="${id}"[^>]*>`));
+  const right=html.match(/<div class="right-column">([\s\S]*?)<\/div><!-- right-column -->/);
+  assert.ok(right); assert.ok(right[1].includes('搜尋統計')); assert.ok(right[1].includes('步驟紀錄'));
+  assert.doesNotMatch(html,/id="explanation"/);
+});

@@ -18,7 +18,7 @@ function setup() {
 test('送出問題後立即顯示答案與完整比對統計，並移除控制列',()=>{
   const {get}=setup(); get('#query').value='MacBook Air 尺寸'; get('#form').listeners.submit({preventDefault(){}});
   assert.match(get('#answer').innerHTML,/13 吋/);
-  assert.equal(get('#compared').textContent,200);
+  assert.equal(get('#compared').textContent,500);
   assert.doesNotMatch(html,/class="controls"/);
 });
 test('範例問題立即顯示答案，空白問題提示且保留結果',()=>{

@@ -23,13 +23,17 @@ test('搜尋提供追溯來源、步驟且排除無關問題', () => {
   assert.equal(search('火星上的香蕉').results.length,0);
   assert.ok(documents.length>=8);
 });
-test('知識庫包含 200 筆唯一、可追溯且均參與比對的資料', () => {
-  assert.equal(documents.length, 200);
-  assert.equal(new Set(documents.map(d => d.id)).size, 200);
+test('知識庫包含 500 筆唯一、可追溯且均參與比對的資料', () => {
+  assert.equal(documents.length, 500);
+  assert.equal(new Set(documents.map(d => d.id)).size, 500);
+  assert.equal(new Set(documents.map(d => d.text)).size, 500);
   assert.ok(documents.every(d => d.text && d.keywords && d.title && /^https:\/\/www\.apple\.com\/tw\//.test(d.url)));
   const run=search('AirPods 降噪');
-  assert.equal(run.steps.filter(s => s.doc !== undefined).length, 200);
-  assert.equal(run.steps.filter(s => s.doc !== undefined).at(-1).doc, 199);
+  assert.equal(run.steps.filter(s => s.doc !== undefined).length, 500);
+  assert.equal(run.steps.filter(s => s.doc !== undefined).at(-1).doc, 499);
+  assert.ok(new Set(documents.map(d => d.url)).size >= 8);
+  const ranked=search('MacBook Air 尺寸',10).results;
+  assert.equal(new Set(ranked.map(d=>d.factId)).size,ranked.length);
 });
 test('各產品與功能問題可找到相關資訊', () => {
   for (const [q, term] of [['iPad 晶片','A16'],['AirPods 降噪','降噪'],['MacBook Air 尺寸','13 吋'],['Apple Watch 換購','換購']]) {

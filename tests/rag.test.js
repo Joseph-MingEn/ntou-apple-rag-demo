@@ -47,6 +47,20 @@ test('檢索會區分產品內的具體功能，避免只因產品名稱得高�
   assert.ok(search('Apple Watch 睡眠').results.every(d=>d.text.includes('睡眠')));
 });
 
+test('價格、其他品牌及未收錄規格不應憑產品類別回答',()=>{
+  for(const q of ['iPhone 價格多少錢','Samsung 手機','Android 手機','iPhone 支援衛星網路嗎']) assert.equal(search(q).results.length,0,q);
+});
+test('型號與像素資訊可區分相似的產品文件',()=>{
+  const results=search('iPhone 18 Pro 相機幾萬像素').results;
+  assert.ok(results.length); assert.match(results[0].text,/4800\s*萬像素/);
+  assert.ok(results.every(d=>d.text.includes('iPhone 18 Pro')));
+});
+test('整理回答根據證據回答是或否，並保留來源',()=>{
+  const {answer,results}=search('AirPods 有降噪嗎？');
+  assert.match(answer,/有/); assert.ok(results.some(d=>answer.includes(d.id)));
+  assert.match(search('Samsung 手機').answer,/無法/);
+});
+
 test('需求推薦可指出符合用途的產品與真實知識庫依據',()=>{
   const laptop=recommend('我需要輕巧筆電帶去上課');
   assert.ok(laptop.some(p=>p.name==='MacBook Air'));
@@ -54,6 +68,8 @@ test('需求推薦可指出符合用途的產品與真實知識庫依據',()=>{
   assert.ok(noise.some(p=>p.name==='AirPods Pro 3'));
   assert.ok(noise.every(p=>p.evidence.length && p.evidence.every(d=>documents.includes(d))));
   assert.deepEqual(recommend('火星上的香蕉'),[]);
+  assert.deepEqual(recommend('Samsung 手機'),[]);
+  assert.deepEqual(recommend('多少錢的筆電'),[]);
   assert.deepEqual(recommend(''),[]);
 });
 test('指定具體型號時不應推薦其他型號',()=>{

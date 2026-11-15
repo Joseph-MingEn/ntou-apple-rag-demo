@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const html = fs.readFileSync(require('node:path').join(__dirname, '../index.html'), 'utf8');
 test('頁面清楚說明原始資料與衍生索引筆數',()=>{
-  assert.match(html,/429\s*筆原始/); assert.match(html,/571\s*筆.*索引/);
+  assert.match(html,/477\s*筆原始/); assert.match(html,/523\s*筆.*索引/);
 });
 test('頁面說明 RAG 三階段與示範限制，右上角連到專案儲存庫', () => {
   assert.match(html, /<header[^>]*>[\s\S]*?href="https:\/\/github\.com\/Joseph-MingEn\/ntou-apple-rag-demo"[\s\S]*?<\/header>/);

@@ -18,7 +18,7 @@ test('最小堆積保留最高 k 筆並維持堆頂最低', () => {
 test('搜尋提供追溯來源、步驟且排除無關問題', () => {
   const found=search('iPad 晶片');
   assert.ok(found.results.some(x=>x.id==='D1'));
-  assert.ok(found.results.every(x=>x.score>=0.3 && x.url.startsWith('https://www.apple.com/tw/')));
+  assert.ok(found.results.every(x=>x.score>=0.3 && /^https:\/\/(www\.apple\.com\/tw\/|support\.apple\.com\/zh-tw\/)/.test(x.url)));
   assert.equal(found.steps.at(-1).type,'ANSWER');
   assert.equal(search('火星上的香蕉').results.length,0);
   assert.ok(documents.length>=8);
@@ -28,7 +28,7 @@ test('知識庫包含 1000 筆唯一、可追溯且均參與比對的資料', ()
   assert.equal(documents.length, 1000);
   assert.equal(new Set(documents.map(d => d.id)).size, 1000);
   assert.equal(new Set(documents.map(d => d.text)).size, 1000);
-  assert.ok(documents.every(d => d.text && d.keywords && d.title && /^https:\/\/www\.apple\.com\/tw\//.test(d.url)));
+  assert.ok(documents.every(d => d.text && d.keywords && d.title && /^https:\/\/(www\.apple\.com\/tw\/|support\.apple\.com\/zh-tw\/)/.test(d.url)));
   const run=search('AirPods 降噪');
   assert.equal(run.steps.filter(s => s.doc !== undefined).length, 1000);
   assert.equal(run.steps.filter(s => s.doc !== undefined).at(-1).doc, 999);
@@ -36,6 +36,12 @@ test('知識庫包含 1000 筆唯一、可追溯且均參與比對的資料', ()
   assert.ok(new Set(documents.map(d => d.url)).size >= 8);
   const ranked=search('MacBook Air 尺寸',10).results;
   assert.equal(new Set(ranked.map(d=>d.factId)).size,ranked.length);
+});
+test('歷代產品能依指定世代找到官方技術規格',()=>{
+  for(const [question, expected] of [['iPhone 13 晶片','A15'],['iPhone 14 相機幾萬像素','1200 萬像素'],['iPhone 15 Pro 晶片','A17 Pro'],['iPhone 16 Pro 晶片','A18 Pro'],['iPad Air 第 5 代 晶片','M1'],['MacBook Air M3 晶片','M3'],['Apple Watch Series 9 晶片','S9'],['AirPods Pro 2 降噪','降噪']]) {
+    const results=search(question,2).results; assert.ok(results.some(d=>d.text.includes(expected)),question); assert.ok(results.some(d=>d.url.startsWith('https://support.apple.com/zh-tw/')),question);
+  }
+  assert.ok(search('iPhone 15 晶片',2).results.every(d=>!/iPhone 15 Pro/.test(d.text)));
 });
 test('各產品與功能問題可找到相關資訊', () => {
   for (const [q, term] of [['iPad 晶片','A16'],['AirPods 降噪','降噪'],['MacBook Air 尺寸','13 吋'],['Apple Watch 換購','換購']]) {

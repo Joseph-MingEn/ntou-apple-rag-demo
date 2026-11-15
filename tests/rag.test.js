@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const {vectorize, cosine, MinHeap, search, documents, recommend} = require('../rag.js');
+const {vectorize, cosine, MinHeap, search, documents, recommend,topics} = require('../rag.js');
 test('關鍵字向量識別產品及主題，未知文字為零向量', () => {
   assert.ok(vectorize('iPad 使用什麼晶片')[1] > 0);
   assert.ok(vectorize('iPad 使用什麼晶片')[6] > 0);
@@ -23,14 +23,16 @@ test('搜尋提供追溯來源、步驟且排除無關問題', () => {
   assert.equal(search('火星上的香蕉').results.length,0);
   assert.ok(documents.length>=8);
 });
-test('知識庫包含 500 筆唯一、可追溯且均參與比對的資料', () => {
-  assert.equal(documents.length, 500);
-  assert.equal(new Set(documents.map(d => d.id)).size, 500);
-  assert.equal(new Set(documents.map(d => d.text)).size, 500);
+test('知識庫包含 1000 筆唯一、可追溯且均參與比對的資料', () => {
+  assert.equal(topics.length,100); assert.equal(vectorize('iPhone 相機').length,100);
+  assert.equal(documents.length, 1000);
+  assert.equal(new Set(documents.map(d => d.id)).size, 1000);
+  assert.equal(new Set(documents.map(d => d.text)).size, 1000);
   assert.ok(documents.every(d => d.text && d.keywords && d.title && /^https:\/\/www\.apple\.com\/tw\//.test(d.url)));
   const run=search('AirPods 降噪');
-  assert.equal(run.steps.filter(s => s.doc !== undefined).length, 500);
-  assert.equal(run.steps.filter(s => s.doc !== undefined).at(-1).doc, 499);
+  assert.equal(run.steps.filter(s => s.doc !== undefined).length, 1000);
+  assert.equal(run.steps.filter(s => s.doc !== undefined).at(-1).doc, 999);
+  assert.ok(documents.some(d=>d.url.includes('/nccid/') && d.text.includes('A3714')));
   assert.ok(new Set(documents.map(d => d.url)).size >= 8);
   const ranked=search('MacBook Air 尺寸',10).results;
   assert.equal(new Set(ranked.map(d=>d.factId)).size,ranked.length);
@@ -54,6 +56,9 @@ test('型號與像素資訊可區分相似的產品文件',()=>{
   const results=search('iPhone 18 Pro 相機幾萬像素').results;
   assert.ok(results.length); assert.match(results[0].text,/4800\s*萬像素/);
   assert.ok(results.every(d=>d.text.includes('iPhone 18 Pro')));
+  const cert=search('iPhone 18 Pro 型號 NCC 認證').results;
+  assert.ok(cert.some(d=>d.text.includes('A3714')));
+  assert.ok(cert.every(d=>!d.text.includes('iPhone 18 Pro Max')));
 });
 test('整理回答根據證據回答是或否，並保留來源',()=>{
   const {answer,results}=search('AirPods 有降噪嗎？');

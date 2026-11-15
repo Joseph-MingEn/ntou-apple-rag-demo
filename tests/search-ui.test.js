@@ -47,3 +47,12 @@ test('送出使用需求後顯示推薦與來源，未知需求提供提示',()=
   get('#needs').value='火星香蕉'; get('#recommend-form').listeners.submit({preventDefault(){}});
   assert.match(get('#recommendations').innerHTML,/無法辨識/);
 });
+
+test('價格與其他品牌問題在畫面顯示拒答理由',()=>{
+  const {get}=setup();
+  for(const [q,pattern] of [['iPhone 多少錢',/價格/],['Samsung 手機',/Apple 產品/]]) {
+    get('#query').value=q; get('#form').listeners.submit({preventDefault(){}});
+    assert.match(get('#answer').innerHTML,pattern); assert.doesNotMatch(get('#answer').innerHTML,/\$\{/);
+    assert.match(get('#retrieved').innerHTML,/沒有符合/);
+  }
+});

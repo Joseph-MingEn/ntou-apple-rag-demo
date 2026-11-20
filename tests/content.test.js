@@ -2,6 +2,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const html = fs.readFileSync(require('node:path').join(__dirname, '../index.html'), 'utf8');
+test('網站呈現個人貢獻與 AI 協作說明',()=>{
+  assert.match(html, /<section id="contribution"[\s\S]*?個人貢獻與 AI 協作說明/);
+  for (const text of ['選定主題與參考資料','規劃功能與操作流程','調整介面與資料範圍','檢視結果並推動修正','回應教師建議','AI 協助整理 Apple 官方資料']) assert.ok(html.includes(text), text);
+});
 test('頁面清楚說明原始資料與衍生索引筆數',()=>{
   assert.match(html,/477\s*筆原始/); assert.match(html,/523\s*筆.*索引/);
 });
